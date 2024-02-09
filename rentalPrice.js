@@ -56,7 +56,7 @@ function calculateRentalPrice(pickupDate, dropoffDate, type, age, licenseYears) 
 function applyLicenseYearsDiscount(rentalPrice, licenseYears, season, days) {   
 
     if (licenseYears < LICENSE_YEARS_THRESHOLD_3 && season === "High") {
-        rentalPrice + (LICENSE_YEARS_PRICE_INCREASE_3 * days);
+        rentalPrice += (LICENSE_YEARS_PRICE_INCREASE_3 * days);
     }
     return rentalPrice;
 
