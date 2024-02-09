@@ -18,8 +18,6 @@ app.post('/', (req, res) => {
     const formData = req.body;
     const carClass = formData.type;
     const rentalPrice = rental.calculateRentalPrice(
-        formData.pickup,
-        formData.dropoff,
         formData.pickupdate,
         formData.dropoffdate,
         carClass,

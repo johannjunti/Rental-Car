@@ -12,19 +12,27 @@ const LICENSE_YEARS_THRESHOLD_3 = 3;
 const LICENSE_YEARS_PRICE_INCREASE_2 = 0.3;
 const LICENSE_YEARS_PRICE_INCREASE_3 = 15;
 
-function calculateRentalPrice(pickup, dropoff, pickupDate, dropoffDate, type, age, licenseYears) {
-    const carClass = getCarClass(type);
-    const days = calculateRentalDays(pickupDate, dropoffDate);
-    const season = getSeason(pickupDate);
-
+function canRentCar(age, licenseYears, carClass) {
     if (age < MIN_DRIVER_AGE) {
         return "Driver too young - cannot rent a car.";
     }
-    if (licenseYears = LICENSE_YEARS_THRESHOLD_1) {
+    if (licenseYears === LICENSE_YEARS_THRESHOLD_1) {
         return "Driver must hold a license for at least one year to rent a car.";
     }
     if (carClass !== "Compact" && (age >= MIN_DRIVER_AGE && age <= COMPACT_AGE_LIMIT)) {
         return "Drivers aged 18-21 can only rent Compact cars.";
+    }
+    return true;
+}
+
+function calculateRentalPrice(pickupDate, dropoffDate, type, age, licenseYears) {
+    const days = calculateRentalDays(pickupDate, dropoffDate);
+    const season = getSeason(pickupDate);
+    
+    const carClass = type;
+    const canRent = canRentCar(age, licenseYears, carClass);
+    if (canRent !== true) {
+        return canRent;
     }
 
     let rentalPrice = age;
@@ -41,29 +49,17 @@ function calculateRentalPrice(pickup, dropoff, pickupDate, dropoffDate, type, ag
         rentalPrice *= DISCOUNT_MORE_THAN_10_DAYS;
     }
 
-    if (licenseYears = LICENSE_YEARS_THRESHOLD_2) {
-        rentalPrice *= 1 + LICENSE_YEARS_PRICE_INCREASE_2;
-    } else if (licenseYears = LICENSE_YEARS_THRESHOLD_3 && season === "High") {
-        rentalPrice += LICENSE_YEARS_PRICE_INCREASE_3;
-    }
+    rentalPrice = applyLicenseYearsDiscount(rentalPrice, licenseYears, season, days);
 
-    return '$' + rentalPrice * days;
+    return '$' + (rentalPrice * days).toFixed(2);
 }
+function applyLicenseYearsDiscount(rentalPrice, licenseYears, season, days) {   
 
-
-function getCarClass(type) {
-    switch (type) {
-        case "Compact":
-            return "Compact";
-        case "Electric":
-            return "Electric";
-        case "Cabrio":
-            return "Cabrio";
-        case "Racer":
-            return "Racer";
-        default:
-            return "Unknown";
+    if (licenseYears < LICENSE_YEARS_THRESHOLD_3 && season === "High") {
+        rentalPrice + (LICENSE_YEARS_PRICE_INCREASE_3 * days);
     }
+    return rentalPrice;
+
 }
 
 function calculateRentalDays(pickupDate, dropoffDate) {
